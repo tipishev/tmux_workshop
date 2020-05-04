@@ -146,5 +146,6 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 
 
 # Links
-https://habr.com/en/post/165437/
-https://pragprog.com/book/bhtmux2/tmux-2
+
+* https://habr.com/en/post/165437/
+* https://pragprog.com/book/bhtmux2/tmux-2
