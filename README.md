@@ -113,12 +113,23 @@ From the olden days of window point-and-click buffers were useful, so tmux impro
 
 A whole new beast: `:`
 
+Hello world: `display-message hello!`
+
 Targeting with `-t` (target) and sometimes `-s` (source)
 
 * `target-client`: /dev/ttyp1
 * `target-session`: 4 rules
 * `target-window`: 6 rules... and special symbols
 * `target-pane`: special tokens, including relative positions and offsets
+
+* if you have smuggled a mouse, use `{mouse}` to get target.
+* `{marked}` can be also used
+
+* sessions `$` , windows `@`, panes `%` have id, immutable, on server
+* `$TMUX`, `$TMUX_PANE`
+
+* `list-sessions`, `list-windows`, `list-panes`
+* `session_id`, `window_id`, or `pane_id` FORMATS
 
 
 
