@@ -4,13 +4,13 @@ Here I aggregate my notes and slides for a workshop on Tmux.
 
 # Backstory
 
-It's year 2022, following the virus outbreak economy is in decline, desktop and web applications are rapidly fading into obscurity due to continued [software disenchantment](https://tonsky.me/blog/disenchantment/), bandwidths have shrunk to dialup and command line apps are all the rage. A new kind of developer is in high demand. Those who can combine textual information in terminals. You discover an almost forgotten art of tmuxing: creating persistent collections of pseudoterminals.
+It's year 2022, following the virus outbreak economy is in decline, desktop and web applications are rapidly fading into obscurity due to continued [software disenchantment](https://tonsky.me/blog/disenchantment/), bandwidths have shrunk to dialup and command line apps are all the rage. The medical tyranny has forbidden all the mice since they spread infections. A new kind of developer is in high demand. Those who can combine textual information in terminals. You discover an almost forgotten art of tmuxing: creating persistent collections of pseudoterminals.
 
 # Theory
 
 ## `man tmux`
 
-* session, window, pane, status line, commands
+* server, client, session, window, pane, status line, commands
 * pty(4) for technical info on pseudo terminals
 * session is a collection of pseudo terminals, organized in windows and panes
 * clients can connect to the same tmux session: one server, many clients
@@ -112,6 +112,15 @@ From the olden days of window point-and-click buffers were useful, so tmux impro
 ## Commands
 
 A whole new beast: `:`
+
+Targeting with `-t` (target) and sometimes `-s` (source)
+
+* `target-client`: /dev/ttyp1
+* `target-session`: 4 rules
+* `target-window`: 6 rules... and special symbols
+* `target-pane`: special tokens, including relative positions and offsets
+
+
 
 * Group panes `join-pane -t :{window number}`
 
