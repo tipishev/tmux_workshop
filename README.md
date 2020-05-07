@@ -21,6 +21,7 @@ It's year 2022, following the virus outbreak economy is in decline, desktop and 
 * can execute command via `-c` flag
 * `command [flags]` can be sent as the last argument to tmux
 
+
 ### Config
 
 * `-f some_tmux.conf` > `~/.tmux.conf` > `/etc/tmux.conf`
@@ -41,6 +42,9 @@ It's year 2022, following the virus outbreak economy is in decline, desktop and 
 ### Colors
 
 * for 256 colors `tmux -2 a`
+
+### CLIENTS AND SESSIONS
+
 
 # Practice
 
@@ -130,8 +134,15 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 
 * `list-sessions`, `list-windows`, `list-panes`
 * `session_id`, `window_id`, or `pane_id` FORMATS
-
-
+* pass command to execute to
+  - `new-window`
+  - `new-session`
+  - `split-window`
+  - `respawn-window`
+  - `respawn-pane`
+* `bind-key F1 set-window-option force-width 81` from inside Tmux
+* `tmux bind-key F1 set-window-option force-width 81` from outside Tmux
+* `bind-key R source-file ~/.tmux.conf; display-message "config reloaded"`
 
 * Group panes `join-pane -t :{window number}`
 
@@ -143,6 +154,8 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 # Random Stuff
 
 * "You have control" -> "I have control"
+* `split-window vim foo.txt` opens a split and runs the command
+* tmux commands for starting pre-set window layouts and commands
 
 
 # Links
