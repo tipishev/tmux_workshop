@@ -153,7 +153,10 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 
 # Random Stuff
 
-* "You have control" -> "I have control"
+* maxing out scrollback buffer
+* writing log to file for postmortem
+* lure away from using `screen`
+* "You have control" -> "I have control" shared screen routine
 * `split-window vim foo.txt` opens a split and runs the command
 * tmux commands for starting pre-set window layouts and commands
 
