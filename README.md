@@ -165,3 +165,5 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 
 * https://habr.com/en/post/165437/
 * https://pragprog.com/book/bhtmux2/tmux-2
+* https://github.com/christoomey/vim-tmux-navigator
+* https://iterm2.com/documentation-tmux-integration.html
