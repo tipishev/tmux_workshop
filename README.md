@@ -6,7 +6,45 @@ Here I aggregate my notes and slides for a workshop on Tmux.
 
 It's year 2022, following the virus outbreak economy is in decline, desktop and web applications are rapidly fading into obscurity due to continued [software disenchantment](https://tonsky.me/blog/disenchantment/), bandwidths have shrunk to dialup and command line apps are all the rage. The medical tyranny has forbidden all the mice since they spread infections. A new kind of developer is in high demand. Those who can combine textual information in terminals. You discover an almost forgotten art of tmuxing: creating persistent collections of pseudoterminals.
 
+
+---
+
+# Pre-requisites
+
+* familiarity with command line
+* instructions on how to install for the big 3 OSes
+
+# Misceallaneous
+
+* Fascination with tooling, big enough to be useful, small enough to be doable, i.e. no Vim. My previous talks.
+* The sea of craziness metaphor
+* Resisted learning systemd, one of my production services was a tmux-session.
+
 # Theory
+
+## The book
+
+* build development environment
+* make administration/deploy/monitoring dashboard
+* tmate? as alternative to pair programming
+* plugins?
+* `tmux new-session -s basic` shorten to `tmux new -s basic`
+* `exit` or `^D`
+* prefix: same everywhere, thus digging else `^b` for local `^a` for remote.
+* `tmux list-sessions` -> `tmux ls`
+* `tmux new -s second_session -d` to start a session in the background.
+* `tmux kill-session -t basic`
+* `tmux new -s windows -n shell`
+* `Pr-n`/`Pr-p` for cycling between windows
+* `Pr-w` for an interactive overview
+* `Pr-f` for string search
+* `Pr-&` end it all, with confirmation
+* `Pr-%`, `Pr-"`, `Pr-o`, `Pr-arrows` for moving between splits
+* `^<space>` for pre-set layouts
+* `:new-window -n processes "htop"`
+
+* `Pr-?` for current key-bindings,TODO run it
+
 
 ## `man tmux`
 
@@ -130,15 +168,15 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 * `{marked}` can be also used
 
 * sessions `$` , windows `@`, panes `%` have id, immutable, on server
-* `$TMUX`, `$TMUX_PANE`
+  * `$TMUX`, `$TMUX_PANE`
 
-* `list-sessions`, `list-windows`, `list-panes`
-* `session_id`, `window_id`, or `pane_id` FORMATS
-* pass command to execute to
-  - `new-window`
-  - `new-session`
-  - `split-window`
-  - `respawn-window`
+  * `list-sessions`, `list-windows`, `list-panes`
+  * `session_id`, `window_id`, or `pane_id` FORMATS
+  * pass command to execute to
+    - `new-window`
+    - `new-session`
+    - `split-window`
+    - `respawn-window`
   - `respawn-pane`
 * `bind-key F1 set-window-option force-width 81` from inside Tmux
 * `tmux bind-key F1 set-window-option force-width 81` from outside Tmux
