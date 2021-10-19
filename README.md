@@ -192,7 +192,7 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 # Random Stuff
 
 * maxing out scrollback buffer
-* writing log to file for postmortem
+* writing log to file for postmortem, Prefix-P in my config
 * lure away from using `screen`
 * "You have control" -> "I have control" shared screen routine
 * `split-window vim foo.txt` opens a split and runs the command
