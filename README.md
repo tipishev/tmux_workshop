@@ -2,6 +2,18 @@
 
 Here I aggregate my notes and slides for a workshop on Tmux.
 
+---
+
+```bash
+docker build -t tmux-tutorial .
+docker run -it tmux-tutorial
+```
+
+
+
+
+---
+
 # Backstory
 
 It's year 2022, following the virus outbreak economy is in decline, desktop and web applications are rapidly fading into obscurity due to continued [software disenchantment](https://tonsky.me/blog/disenchantment/), bandwidths have shrunk to dialup and command line apps are all the rage. The medical tyranny has forbidden all the mice since they spread infections. A new kind of developer is in high demand. Those who can combine textual information in terminals. You discover an almost forgotten art of tmuxing: creating persistent collections of pseudoterminals.
@@ -12,6 +24,7 @@ It's year 2022, following the virus outbreak economy is in decline, desktop and 
 # Pre-requisites
 
 * familiarity with command line
+* Docker installed on local system
 * instructions on how to install for the big 3 OSes
 
 # Misceallaneous
