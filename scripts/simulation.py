@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from apscheduler.schedulers.background import BackgroundScheduler
 import json
 import os
+from enum import Enum
 
 app = Flask(__name__)
 STATE_FILE = "state.json"
@@ -9,6 +10,50 @@ STATE_FILE = "state.json"
 SOL = 1
 ICE = 10
 MAP = [SOL, 2, 3, 4, 5, 6, 7, 8, 9, ICE]
+
+class RoverState(Enum):
+    GOING_TO_SOL = 1
+    GOING_TO_ICE = 2
+    AT_SOL = 3
+    AT_ICE = 4
+
+# State transitions table
+state_transitions = {
+    RoverState.GOING_TO_SOL: {
+        "move_to_sol": RoverState.AT_SOL,
+        "move_to_ice": RoverState.GOING_TO_ICE,
+    },
+    RoverState.GOING_TO_ICE: {
+        "move_to_sol": RoverState.GOING_TO_SOL,
+        "move_to_ice": RoverState.AT_ICE,
+    },
+    RoverState.AT_SOL: {
+        "move_to_sol": RoverState.AT_SOL,
+        "move_to_ice": RoverState.GOING_TO_ICE,
+    },
+    RoverState.AT_ICE: {
+        "move_to_sol": RoverState.GOING_TO_SOL,
+        "move_to_ice": RoverState.AT_ICE,
+    }
+}
+
+# Endpoint to move rover
+@app.route("/move_rover", methods=["POST"])
+def move_rover():
+    data = request.json
+    rover_name = data["rover"]
+    destination = data["destination"]
+    current_state = state["rovers"][rover_name]["state"]
+    
+    # Check if the action is valid for the current state
+    if current_state in state_transitions and data["action"] in state_transitions[current_state]:
+        # Update the rover's location and state
+        state["rovers"][rover_name]["location"] = destination
+        state["rovers"][rover_name]["state"] = state_transitions[current_state][data["action"]]
+        save_state()
+        return jsonify({"message": f"{rover_name} moved to {destination}"}), 200
+    else:
+        return jsonify({"message": "Invalid action for the current state"}), 400
 
 
 def init_state(state_file=STATE_FILE):
@@ -68,23 +113,10 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(produce_resources, "interval", seconds=1)
 scheduler.start()
 
-
-# Endpoint to move rover
-@app.route("/move_rover", methods=["POST"])
-def move_rover():
-    data = request.json
-    rover_name = data["rover"]
-    destination = data["destination"]
-    state["rovers"][rover_name]["location"] = destination
-    save_state()
-    return jsonify({"message": f"{rover_name} moved to {destination}"}), 200
-
-
 # Endpoint to get current state
 @app.route("/state", methods=["GET"])
 def get_state():
     return jsonify(state)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
