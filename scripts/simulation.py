@@ -18,8 +18,8 @@ AT_SOL = "at Sol"
 AT_ICE = "at Ice"
 
 # Rover commands
-GO_TO_SOL = "go to Sol"
-GO_TO_ICE = "go to Ice"
+GO_TO_SOL = "go to Sol!"
+GO_TO_ICE = "go to Ice!"
 
 # State transitions table
 # {current_state: {command: resulting_state}, ...}
@@ -128,5 +128,11 @@ scheduler.start()
 def get_state():
     return jsonify(state)
 
+# Endpoint to get current base state, base name is passed as a query parameter
+@app.route("/base", methods=["GET"])
+def get_base():
+    base_name = request.args.get("name")
+    return jsonify(state["bases"][base_name])
+
 if __name__ == "__main__":
-    app.run(debug=True)  
+    app.run(debug=True)
