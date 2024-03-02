@@ -4,20 +4,37 @@ Here I aggregate my notes and slides for a workshop on Tmux.
 
 ---
 
+TODO add SSH access to the container
+
 ```bash
 docker build -t tmux-tutorial .
 docker run -it tmux-tutorial
 ```
 
+`tmux new -s ""`
 
+prefix-Q -> choose the pane
 
+`tmux new -n "my top window" top`
 
+ `*` (current) and `-` (previous) semantics, same as bash or git.
+
+> C-M-x means pressing the control key, meta key and x together.
+
+* `C-b ?` shows help
+* C-b /       Describe key binding
 ---
 
 # Backstory
 
-It's year 2022, following the virus outbreak economy is in decline, desktop and web applications are rapidly fading into obscurity due to continued [software disenchantment](https://tonsky.me/blog/disenchantment/), bandwidths have shrunk to dialup and command line apps are all the rage. The medical tyranny has forbidden all the mice since they spread infections. A new kind of developer is in high demand. Those who can combine textual information in terminals. You discover an almost forgotten art of tmuxing: creating persistent collections of pseudoterminals.
+It's year 2028, desktop and web applications are rapidly fading into obscurity due to continued [software disenchantment](https://tonsky.me/blog/disenchantment/), bandwidths have shrunk to dialup and command line apps are all the rage. A new kind of developer is in high demand. Those who can combine textual information in terminals. You discover an almost forgotten art of tmuxing: creating persistent collections of pseudoterminals.
 
+---
+
+# Tricks
+
+* `display-popup -T Calendar -w 23 -h 11 "cal -m"`
+* `set synchronize-panes` for doing the same operation on multiple servers
 
 ---
 
@@ -29,9 +46,10 @@ It's year 2022, following the virus outbreak economy is in decline, desktop and 
 
 # Misceallaneous
 
-* Fascination with tooling, big enough to be useful, small enough to be doable, i.e. no Vim. My previous talks.
-* The sea of craziness metaphor
-* Resisted learning systemd, one of my production services was a tmux-session.
+* Fascination with tooling, big enough to be useful, small enough to be doable, i.e. no Vim. See my previous talks.
+* The sea of craziness metaphor: safe and bland vs. very customized but unsupported
+* For a long time Resisted learning systemd, one of my production services was a tmux-session.
+* "What if I told you that one terminal window is all you need?"
 
 # Theory
 
@@ -56,7 +74,7 @@ It's year 2022, following the virus outbreak economy is in decline, desktop and 
 * `^<space>` for pre-set layouts
 * `:new-window -n processes "htop"`
 
-* `Pr-?` for current key-bindings,TODO run it
+* `Pr-?` for current key-bindings, TODO run it
 
 
 ## `man tmux`
@@ -102,8 +120,8 @@ It's year 2022, following the virus outbreak economy is in decline, desktop and 
 ## Basic Usage
 
 * basic start
-* run long command
-* dettach with `d`
+* start a long-running command
+* dettach with `prefix-d`
 * re-attach with `tmux attach` or `tmux a`
 
 ### Bonus
@@ -129,7 +147,7 @@ It's year 2022, following the virus outbreak economy is in decline, desktop and 
 * create window `c`
 * switch between numbered windows
 * name window with `,`
-* ~e~ and it all.. with `&`
+* ~e~and it all.. with `&`
 * move with `.`, pro-tip: autonumber to allow moving to `0` and `99`
 * `f` search window for text
 * `i` window info, too fast? use `~` to see tmux messages
@@ -211,9 +229,9 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 * `split-window vim foo.txt` opens a split and runs the command
 * tmux commands for starting pre-set window layouts and commands
 
-
 # Links
 
+* https://tmuxcheatsheet.com/
 * https://habr.com/en/post/165437/
 * https://pragprog.com/book/bhtmux2/tmux-2
 * https://github.com/christoomey/vim-tmux-navigator
