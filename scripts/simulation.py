@@ -44,12 +44,14 @@ def init_state(state_file=STATE_FILE):
                 "Chip": {
                     "location": SOL,
                     "state": AT_SOL,
-                    "cargo": {"energy": 0, "water": 0},
+                    "energy": 0,
+                    "water": 0,
                 },
                 "Dale": {
                     "location": ICE,
                     "state": AT_ICE,
-                    "cargo": {"energy": 0, "water": 0},
+                    "energy": 0,
+                    "water": 0,
                 },
             },
         }
@@ -79,42 +81,47 @@ def produce_resources():
         ice["water"] += 2
     save_state()
 
-# Scheduled task for rover movement and cargo loading
+# Scheduled task for rover movement and cargo loading.
+# If rover is at Sol, load one unit of energy per second, until the cargo of 10 units is full.
+# If rover is at Ice, load one unit of water per second, until the cargo of 10 units is full.
+# If rover is going to Sol, move one step per second towards Sol (+1).
+# If rover is going to Ice, move one step per second towards Ice (-1).
 def move_rover():
     for rover in state["rovers"].values():
-        if rover["state"] in [TO_SOL, TO_ICE]:
-            continue
-        location = rover["location"]
         if rover["state"] == AT_SOL:
-            base = state["bases"]["Sol"]
-        else:
-            base = state["bases"]["Ice"]
-        if rover["cargo"]["energy"] < 5:
-            cargo_space = 5 - rover["cargo"]["energy"]
-            if base["energy"] >= cargo_space:
-                base["energy"] -= cargo_space
-                rover["cargo"]["energy"] += cargo_space
-            else:
-                rover["cargo"]["energy"] += base["energy"]
-                base["energy"] = 0
-        if rover["cargo"]["water"] < 5:
-            cargo_space = 5 - rover["cargo"]["water"]
-            if base["water"] >= cargo_space:
-                base["water"] -= cargo_space
-                rover["cargo"]["water"] += cargo_space
-            else:
-                rover["cargo"]["water"] += base["water"]
-                base["water"] = 0
-        if rover["state"] == AT_SOL:
-            if location == SOL:
+            sol = state["bases"]["Sol"]
+            # try to unload the water from rover first
+            if rover["water"] > 0:
+                rover["water"] -= 1
+                sol["water"] += 1
+            # try to load the energy
+            elif rover["energy"] < 10 and sol["energy"] > 0:
+                sol["energy"] -= 1
+                rover["energy"] += 1
+            # if full, go to Ice
+            elif rover["energy"] == 10:
                 rover["state"] = TO_ICE
-            else:
-                rover["location"] -= 1
-        else:
-            if location == ICE:
+        elif rover["state"] == AT_ICE:
+            ice = state["bases"]["Ice"]
+            # try to unload the energy from rover first
+            if rover["energy"] > 0:
+                rover["energy"] -= 1
+                ice["energy"] += 1
+            # try to load the water
+            elif rover["water"] < 10 and ice["water"] > 0:
+                ice["water"] -= 1
+                rover["water"] += 1
+            # if full, go to Sol
+            elif rover["water"] == 10:
                 rover["state"] = TO_SOL
-            else:
-                rover["location"] += 1
+        elif rover["state"] == TO_SOL:
+            rover["location"] += 1
+            if rover["location"] == SOL:
+                rover["state"] = AT_SOL
+        elif rover["state"] == TO_ICE:
+            rover["location"] -= 1
+            if rover["location"] == ICE:
+                rover["state"] = AT_ICE
     save_state()
 
 
@@ -143,7 +150,7 @@ def get_rover():
     rover_name = request.args.get("name")
     return jsonify(state["rovers"][rover_name])
 
-# Endpoint to move rover
+# Endpoint to change a rover destination
 @app.route("/rover", methods=["POST"])
 def move_rover():
     rover_name = request.json["rover"]

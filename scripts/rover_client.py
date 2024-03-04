@@ -38,14 +38,16 @@ def main(stdscr):
         else:
             stdscr.clear()
             stdscr.addstr(0, 0, f"{rover_name}", curses.color_pair(BLUE))
-            stdscr.addstr(1, 0, f"{display_cargo(rover['cargo'])}")
+            stdscr.addstr(1, 0, f"{display_cargo(rover)}")
             stdscr.addstr(2, 0, f"location: {display_location(rover['location'])}")
             stdscr.addstr(3, 0, f"state: {rover['state']}")
         stdscr.refresh()
         time.sleep(1)
 
-def display_cargo(cargo: dict):
-    # filter for non-zero cargo
+def display_cargo(rover: dict):
+    CARGO_KEYS = ["energy", "water"]
+    cargo = {k: v for k, v in rover.items() if k in CARGO_KEYS}
+
     cargo = {k: v for k, v in cargo.items() if v > 0}
     emoji_lookup = {"energy": "🔋", "water": "💧"}
     return ' '.join([f"{emoji_lookup[k]} {v}" for k, v in cargo.items()])
