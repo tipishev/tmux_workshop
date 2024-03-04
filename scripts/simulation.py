@@ -30,16 +30,6 @@ state_transitions = {
     AT_ICE: {GO_TO_SOL: TO_SOL, GO_TO_ICE: AT_ICE},
 }
 
-# Endpoint to move rover
-@app.route("/move_rover", methods=["POST"])
-def move_rover():
-    rover_name = request.json["rover"]
-    command = request.json["command"]
-    rover = state["rovers"][rover_name]
-    current_state = rover["state"]
-    state["rovers"][rover_name]["state"] = state_transitions[current_state][command]
-
-
 def init_state(state_file=STATE_FILE):
     if os.path.exists(state_file):
         with open(state_file, "r") as file:
@@ -68,9 +58,7 @@ def init_state(state_file=STATE_FILE):
             json.dump(state, file)
         return state
 
-
 state = init_state()
-
 
 def save_state():
     with open(STATE_FILE, "w") as file:
@@ -133,6 +121,21 @@ def get_state():
 def get_base():
     base_name = request.args.get("name")
     return jsonify(state["bases"][base_name])
+
+# Endpoint to get current rover state, rover name is passed as a query parameter
+@app.route("/rover", methods=["GET"])
+def get_rover():
+    rover_name = request.args.get("name")
+    return jsonify(state["rovers"][rover_name])
+
+# Endpoint to move rover
+@app.route("/rover", methods=["POST"])
+def move_rover():
+    rover_name = request.json["rover"]
+    command = request.json["command"]
+    rover = state["rovers"][rover_name]
+    current_state = rover["state"]
+    state["rovers"][rover_name]["state"] = state_transitions[current_state][command]
 
 if __name__ == "__main__":
     app.run(debug=True)
