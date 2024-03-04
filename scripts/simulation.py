@@ -2,14 +2,13 @@ from flask import Flask, jsonify, request
 from apscheduler.schedulers.background import BackgroundScheduler
 import json
 import os
-from enum import Enum
 
 app = Flask(__name__)
 STATE_FILE = "state.json"
 
-SOL = 1
-ICE = 10
-MAP = [SOL, 2, 3, 4, 5, 6, 7, 8, 9, ICE]
+ICE = 1
+SOL = 10
+MAP = [ICE, 2, 3, 4, 5, 6, 7, 8, 9, SOL]
 
 # Rover states
 TO_SOL = "going to Sol"
@@ -42,12 +41,12 @@ def init_state(state_file=STATE_FILE):
                 "Ice": {"energy": 10, "water": 10},
             },
             "rovers": {
-                "Rover1": {
+                "Chip": {
                     "location": SOL,
                     "state": AT_SOL,
                     "cargo": {"energy": 0, "water": 0},
                 },
-                "Rover2": {
+                "Dale": {
                     "location": ICE,
                     "state": AT_ICE,
                     "cargo": {"energy": 0, "water": 0},
@@ -68,13 +67,13 @@ def save_state():
 # Scheduled task for resource production
 def produce_resources():
     sol = state["bases"]["Sol"]
-    if sol["water"] > 0:
+    if sol["water"] > 0: # water is needed for cooling the solar panels
         # spend one unit of water to produce two units of energy
         sol["water"] -= 1
         sol["energy"] += 2
 
     ice = state["bases"]["Ice"]
-    if ice["energy"] > 0:
+    if ice["energy"] > 0: # energy is needed for heating the ice
         # spend one unit of energy to produce two units of water
         ice["energy"] -= 1
         ice["water"] += 2
@@ -82,33 +81,49 @@ def produce_resources():
 
 # Scheduled task for rover movement and cargo loading
 def move_rover():
-    for rover in state["rovers"]:
-        rover = state["rovers"][rover]
-        if rover["state"] == TO_SOL:
-            rover["location"] -= 1
-            if rover["location"] == SOL:
-                rover["state"] = AT_SOL
-        elif rover["state"] == TO_ICE:
-            rover["location"] += 1
-            if rover["location"] == ICE:
-                rover["state"] = AT_ICE
-        elif rover["state"] == AT_SOL:
-            sol = state["bases"]["Sol"]
-            cargo = rover["cargo"]
-            if sol["energy"] >= 1 and cargo["energy"] < 10:
-                sol["energy"] -= 1
-                cargo["energy"] += 1
-        elif rover["state"] == AT_ICE:
-            ice = state["bases"]["Ice"]
-            cargo = rover["cargo"]
-            if ice["water"] >= 1 and cargo["water"] < 10:
-                ice["water"] -= 1
-                cargo["water"] += 1
+    for rover in state["rovers"].values():
+        if rover["state"] in [TO_SOL, TO_ICE]:
+            continue
+        location = rover["location"]
+        if rover["state"] == AT_SOL:
+            base = state["bases"]["Sol"]
+        else:
+            base = state["bases"]["Ice"]
+        if rover["cargo"]["energy"] < 5:
+            cargo_space = 5 - rover["cargo"]["energy"]
+            if base["energy"] >= cargo_space:
+                base["energy"] -= cargo_space
+                rover["cargo"]["energy"] += cargo_space
+            else:
+                rover["cargo"]["energy"] += base["energy"]
+                base["energy"] = 0
+        if rover["cargo"]["water"] < 5:
+            cargo_space = 5 - rover["cargo"]["water"]
+            if base["water"] >= cargo_space:
+                base["water"] -= cargo_space
+                rover["cargo"]["water"] += cargo_space
+            else:
+                rover["cargo"]["water"] += base["water"]
+                base["water"] = 0
+        if rover["state"] == AT_SOL:
+            if location == SOL:
+                rover["state"] = TO_ICE
+            else:
+                rover["location"] -= 1
+        else:
+            if location == ICE:
+                rover["state"] = TO_SOL
+            else:
+                rover["location"] += 1
     save_state()
 
+
 scheduler = BackgroundScheduler()
+
+# TODO combine these jobs into one?
 scheduler.add_job(produce_resources, "interval", seconds=1)
 scheduler.add_job(move_rover, "interval", seconds=1)
+
 scheduler.start()
 
 # Endpoint to get current state

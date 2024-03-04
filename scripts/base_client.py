@@ -27,7 +27,6 @@ def main(stdscr):
     stdscr.nodelay(1)
 
     base_name = sys.argv[1]
-    print(base_name)
     while True:
         try:
             response = requests.get(f"http://localhost:5000/base?name={base_name}")
