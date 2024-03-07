@@ -50,6 +50,8 @@ It demonstrate almost many features of Tmux.
 
 # Tricks
 
+* on/off options can be toggled without specifiying `on`/`off`
+
 ## Building a widget
 
 * fortune with Sun Tzu quotes?
@@ -99,7 +101,8 @@ It demonstrate almost many features of Tmux.
 * The sea of craziness metaphor: safe and bland vs. very customized but unsupported
 * For a long time Resisted learning systemd, one of my production services was a tmux-session.
 * "What if I told you that one terminal window is all you need?"
-** no need for separate tabs or terminal windows or a separate terminal in VS Code and iTerm.
+
+** no need for separate tabs or terminal windows or a separate terminal in VS Code and iTerm, it's all the same terminal, same environment, with the same history.
 
 # Theory
 
