@@ -128,7 +128,7 @@ def move_rover():
 scheduler = BackgroundScheduler()
 
 # TODO combine these jobs into one?
-scheduler.add_job(produce_resources, "interval", seconds=1)
+scheduler.add_job(produce_resources, "interval", seconds=5)
 scheduler.add_job(move_rover, "interval", seconds=1)
 
 scheduler.start()

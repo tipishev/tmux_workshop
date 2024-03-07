@@ -23,18 +23,67 @@ prefix-Q -> choose the pane
 
 * `C-b ?` shows help
 * C-b /       Describe key binding
+* copy-mode
 ---
 
-# Backstory
+Let's take the most complex command from `list-keys`
 
-It's year 2028, desktop and web applications are rapidly fading into obscurity due to continued [software disenchantment](https://tonsky.me/blog/disenchantment/), bandwidths have shrunk to dialup and command line apps are all the rage. A new kind of developer is in high demand. Those who can combine textual information in terminals. You discover an almost forgotten art of tmuxing: creating persistent collections of pseudoterminals.
+`prefix->`
+
+
+```
+display-menu -T "#[align=centre]#{pane_index} (#{pane_id})" -x P -y P "#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Top,
+}" < { send-keys -X history-top } "#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Bottom,}" > { send-keys -X history-bottom } '' "#{?mouse_word,Search For #[underscore]#{=
+/9/...:mouse_word},}" C-r { if-shell -F "#{?#{m/r:(copy|view)-mode,#{pane_mode}},0,1}" "copy-mode -t=" ; send-keys -X -t = search-backward "#{q:mouse_word}" } "#{?mouse_w
+ord,Type #[underscore]#{=/9/...:mouse_word},}" C-y { copy-mode -q ; send-keys -l "#{q:mouse_word}" } "#{?mouse_word,Copy #[underscore]#{=/9/...:mouse_word},}" c { copy-mo
+de -q ; set-buffer "#{q:mouse_word}" } "#{?mouse_line,Copy Line,}" l { copy-mode -q ; set-buffer "#{q:mouse_line}" } '' "Horizontal Split" h { split-window -h } "Vertical
+ Split" v { split-window -v } '' "#{?#{>:#{window_panes},1},,-}Swap Up" u { swap-pane -U } "#{?#{>:#{window_panes},1},,-}Swap Down" d { swap-pane -D } "#{?pane_marked_set
+,,-}Swap Marked" s { swap-pane } '' Kill X { kill-pane } Respawn R { respawn-pane -k } "#{?pane_marked,Unmark,Mark}" m { select-pane -m } "#{?#{>:#{window_panes},1},,-}#{
+?window_zoomed_flag,Unzoom,Zoom}" z { resize-pane -Z }
+```
+
+It demonstrate almost many features of Tmux.
+
+
 
 ---
 
 # Tricks
 
-* `display-popup -T Calendar -w 23 -h 11 "cal -m"`
+## Building a widget
+
+* fortune with Sun Tzu quotes?
+
+* `display-popup -E -T Calendar -w 23 -h 11 "cal -N && read -n 1 -s -r"`
+** check for bound keys with prefix-/
+** bind-key -N "Display a fortune" F display-popup -E -T Fortune -w 80 -h 10 "fortune && read -n 1 -s -r"
+** bind it to a key
+** `cusomize-mode`
+** add note `show calendar`
+** prefix-/ to see the note
+** prefix-? to see the list
+** save key to tmux-config TODO how to paste from history?
+
+## Multi-terminal SSH
+
 * `set synchronize-panes` for doing the same operation on multiple servers
+
+## Preset layouts
+
+* prefix-space
+* display-panes
+* display-panes timeout + reload
+* default: select-pane, change to kill pane, see `template` arg
+
+* `capture-pane` is a screenshot
+
+* `choose-tree` or prefix-w
+
+* prefix-f to find the window: full-text search in what is shown in the pane.
+
+## Key Bindings
+
+* `list-keys` to see the default bindings
 
 ---
 
@@ -50,6 +99,7 @@ It's year 2028, desktop and web applications are rapidly fading into obscurity d
 * The sea of craziness metaphor: safe and bland vs. very customized but unsupported
 * For a long time Resisted learning systemd, one of my production services was a tmux-session.
 * "What if I told you that one terminal window is all you need?"
+** no need for separate tabs or terminal windows or a separate terminal in VS Code and iTerm.
 
 # Theory
 
