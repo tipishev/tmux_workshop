@@ -42,7 +42,7 @@ de -q ; set-buffer "#{q:mouse_word}" } "#{?mouse_line,Copy Line,}" l { copy-mode
 ?window_zoomed_flag,Unzoom,Zoom}" z { resize-pane -Z }
 ```
 
-It demonstrate almost many features of Tmux.
+It demonstrate almost too many features of Tmux.
 
 
 
@@ -51,7 +51,20 @@ It demonstrate almost many features of Tmux.
 # Tricks
 
 * on/off options can be toggled without specifiying `on`/`off`
-
+* bind key to the root table, no need for prefix now you can finally put those silly function keys to use!
+** default root is quite bland, only mouse events with up to triple (!) mouse
+* for complete focus zoom with Z, hide status bar with `set -g status`
+* Klarna shortcuts
+* user options seem interesting
+* `base-index` set to 1 for ease of keyboard access, `pane-base-index` for panes
+* `renumber-windows` to avoid having holes in window numbers
+* status line can be up to 5 lines tall
+* status-interval default is 15 seconds
+* `main-pane-height`, `main-pane-width width`, `other-pane-height`, `other-pane-width`
+* pane-border-indicators [off | colour | arrows | both] is quite neat
+* `popup-border-lines` rounded is cool
+* `alternate-screen [on | off]` wat?
+ 
 ## Building a widget
 
 * fortune with Sun Tzu quotes?
