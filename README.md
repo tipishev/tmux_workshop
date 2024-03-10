@@ -1,30 +1,112 @@
 # Tmux Workshop
 
-Here I aggregate my notes and slides for a workshop on Tmux.
+
+# Introduction
+
+* Fascination with tooling, big enough to be useful, small enough to be doable, i.e. no Vim. See my previous talks.
+* The sea of craziness metaphor: safe and bland vs. very customized but unsupported
+* "What if I told you that one terminal window is all you need?"
+ - no need for separate tabs or terminal windows or a separate terminal in VS Code and iTerm, it's all the same terminal, same environment, with the same history.
+
+## Why Tmux?
+* meme about site hosting
+* build development environment
+* make administration/deploy/monitoring dashboard
+* `exit` or `^D`
+* For a long time Resisted learning systemd, one of my production services was a tmux-session.
+
+# Basic Usage
+ `*` (current) and `-` (previous) semantics, same as bash or git.
+* `base-index` set to 1 for ease of keyboard access, `pane-base-index` for panes
+* `renumber-windows` to avoid having holes in window numbers
+* for complete focus zoom with Z, hide status bar with `set -g status`
+* for 256 colors `tmux -2 a`
+* show the time `t`
 
 ---
+* basic start
+* start a long-running command
+* dettach with `prefix-d`
+* re-attach with `tmux attach` or `tmux a`
+---
 
-TODO add SSH access to the container
 
-```bash
-docker build -t tmux-tutorial .
-docker run -it tmux-tutorial
-```
+## Preset layouts
+* `prefix-space`
+* `display-panes`
+* display-panes timeout + reload
+* default: select-pane, change to kill pane, see `template` arg
+* `main-pane-height`, `main-pane-width width`, `other-pane-height`, `other-pane-width`
+* prefix-f to find the window: full-text search in what is shown in the pane.
 
-`tmux new -s ""`
+# Theory
 
-prefix-Q -> choose the pane
+* server, client, session, window, pane, status line, commands
+* a session can have any number of windows
+* clients can connect to the same tmux session: one server, many clients
+* session is a collection of pseudo terminals, organized in windows and panes
+* tmux exits when the last session is killed
+* pty(4) for technical info on pseudo terminals, `echo $TMUX`
+* client and server are separate processes, communicate via socket in `/tmp`
 
-`tmux new -n "my top window" top`
+## Config
 
- `*` (current) and `-` (previous) semantics, same as bash or git.
+* `-f some_tmux.conf` > `~/.tmux.conf` > `/etc/tmux.conf`
+* use `source-file` command to load a config
+* config loaded once, errors are displayed but ignored, e.g. version change
 
-> C-M-x means pressing the control key, meta key and x together.
 
+# Usability
+* clients seem superfluous, but useful when you connect to the same session from VS code and iTerm.
+ - `choose-tree` or prefix-w
+
+* Windows linked between sessions: cmus?
+* `set synchronize-panes` for doing the same operation on multiple servers
+* prefix: same everywhere, thus digging else `^b` for local `^a` for remote.
+
+## Screenshoting a pane
+* `capture-pane` TODO, doesn't seem to work
+
+## Recording a Session
+* `pipe-pane`
+
+# Options
+* on/off options can be toggled without specifiying `on`/`off`
+* user options seem interesting, prefixed with `@`
+* `cusomize-mode` to see all options
+
+# Key Binding
+* `list-keys` to see the default bindings
 * `C-b ?` shows help
 * C-b /       Describe key binding
-* copy-mode
+* bind key to the root table, no need for prefix now you can finally put those silly function keys to use!
+ - default root is quite bland, only mouse events with up to triple (!) mouse
+* create your own table on top of existing four.
+
 ---
+
+# UI
+
+## Status Line
+* status line can be up to 5 lines tall
+* status-interval default is 15 seconds, change to 1 second for faster refresh, e.g. show seconds in time
+* Space left on disk, for those dockering around
+
+* display-{message,popup,menu}j
+## Popups
+
+### Building a widget
+
+* `display-popup -E -T Calendar -w 23 -h 11 "cal -N && read -n 1 -s -r"`
+** check for bound keys with prefix-/
+** bind-key -N "Display a fortune" F display-popup -E -T Fortune -w 80 -h 10 "fortune && read -n 1 -s -r"
+** bind it to a key
+** add note `show calendar`
+** prefix-/ to see the note
+** prefix-? to see the list
+** save key to tmux-config TODO how to paste from history?
+
+## Menus
 
 Let's take the most complex command from `list-keys`
 
@@ -44,90 +126,66 @@ de -q ; set-buffer "#{q:mouse_word}" } "#{?mouse_line,Copy Line,}" l { copy-mode
 
 It demonstrate almost too many features of Tmux.
 
+### Klarna shortcuts
 
+* starting name with `-` makes an item disabled
+* add a `''` for a separator
 
----
-
-# Tricks
-
-* on/off options can be toggled without specifiying `on`/`off`
-* bind key to the root table, no need for prefix now you can finally put those silly function keys to use!
-** default root is quite bland, only mouse events with up to triple (!) mouse
-* for complete focus zoom with Z, hide status bar with `set -g status`
-* Klarna shortcuts
-* user options seem interesting
-* `base-index` set to 1 for ease of keyboard access, `pane-base-index` for panes
-* `renumber-windows` to avoid having holes in window numbers
-* status line can be up to 5 lines tall
-* status-interval default is 15 seconds
-* `main-pane-height`, `main-pane-width width`, `other-pane-height`, `other-pane-width`
+## Borders
 * pane-border-indicators [off | colour | arrows | both] is quite neat
 * `popup-border-lines` rounded is cool
-* `alternate-screen [on | off]` wat?
- 
-## Building a widget
 
-* fortune with Sun Tzu quotes?
+## Formats
 
-* `display-popup -E -T Calendar -w 23 -h 11 "cal -N && read -n 1 -s -r"`
-** check for bound keys with prefix-/
-** bind-key -N "Display a fortune" F display-popup -E -T Fortune -w 80 -h 10 "fortune && read -n 1 -s -r"
-** bind it to a key
-** `cusomize-mode`
-** add note `show calendar`
-** prefix-/ to see the note
-** prefix-? to see the list
-** save key to tmux-config TODO how to paste from history?
+* Conditionals: show mousy icon in my right status.
+** regular expressions are supported when simple string comparison is not enough 
+* Numeric operators: default integer/float optional
+* `#{e|*|f|4:5.5,3}`  for a complicated calculator
+* `#{a:64}` for ASCII lookup
+* `#{c:turquoise}` for color to RGB hex code
+* padding, truncating, substitution
+* strftime
+* run shell command, e.g. `#(whoami)`
 
-## Multi-terminal SSH
+## Styles #[...]
 
-* `set synchronize-panes` for doing the same operation on multiple servers
+* fg=, bg=
+** black, red, green, yellow, blue, magenta, cyan, white;
+** brightred, brightgreen, brightyellow
+** colour0 to colour255
+** hex-code e.g. #ffffff
+* align: left, center, right
+* best way to play is in status line 
 
-## Preset layouts
 
-* prefix-space
-* display-panes
-* display-panes timeout + reload
-* default: select-pane, change to kill pane, see `template` arg
-
-* `capture-pane` is a screenshot
-
-* `choose-tree` or prefix-w
-
-* prefix-f to find the window: full-text search in what is shown in the pane.
-
-## Key Bindings
-
-* `list-keys` to see the default bindings
-
+### Format Variables
+* there are abbreviations for commonly used ones e.g. `#H` for `host`, `#S` for `session_name`.
+* `display-message "#{cursor_character}"
 ---
 
-# Pre-requisites
+# Copy Mode
+* scrollback and search in history for error message
 
-* familiarity with command line
-* Docker installed on local system
-* instructions on how to install for the big 3 OSes
+# Mouse Usage
+* mouse right-click to select menu items
+ - swap marked from mouse menu
+** (Pane, Border, Status, Status, StatusLeft, StatusRight, StatusDefault) x (WheelUp/WheelDown, Down/Up/Drag, Double/Triple click) create your own crazy interface.
+** {mouse} as the target for commands.
+* Draw a table of possible events and their targets
 
-# Misceallaneous
+# Bad (?) ideas
+* cat own socket to break tmux
+* Pomodoro in Tmux?
+* Pipe pane can be used also for input: `:pipe-pane -I "echo 'echo hello'"`
+ - Funnily enough, both input and output can be enabled for pipe-pane. So, if you want to give some script both input and output access to your terminal, tmux can help you with that.
 
-* Fascination with tooling, big enough to be useful, small enough to be doable, i.e. no Vim. See my previous talks.
-* The sea of craziness metaphor: safe and bland vs. very customized but unsupported
-* For a long time Resisted learning systemd, one of my production services was a tmux-session.
-* "What if I told you that one terminal window is all you need?"
+==========================
 
-** no need for separate tabs or terminal windows or a separate terminal in VS Code and iTerm, it's all the same terminal, same environment, with the same history.
+HERE BE DRAGONS
 
-# Theory
+==========================
 
-## The book
-
-* build development environment
-* make administration/deploy/monitoring dashboard
-* tmate? as alternative to pair programming
-* plugins?
-* `tmux new-session -s basic` shorten to `tmux new -s basic`
-* `exit` or `^D`
-* prefix: same everywhere, thus digging else `^b` for local `^a` for remote.
+---
 * `tmux list-sessions` -> `tmux ls`
 * `tmux new -s second_session -d` to start a session in the background.
 * `tmux kill-session -t basic`
@@ -141,60 +199,6 @@ It demonstrate almost too many features of Tmux.
 * `:new-window -n processes "htop"`
 
 * `Pr-?` for current key-bindings, TODO run it
-
-
-## `man tmux`
-
-* server, client, session, window, pane, status line, commands
-* pty(4) for technical info on pseudo terminals
-* session is a collection of pseudo terminals, organized in windows and panes
-* clients can connect to the same tmux session: one server, many clients
-* a session can have any number of windows
-* tmux exits when the last session is killed
-* client and server are separate processes, communicate via socket in `/tmp`
-* CONTROL MODE? -CC disables echo
-* can execute command via `-c` flag
-* `command [flags]` can be sent as the last argument to tmux
-
-
-### Config
-
-* `-f some_tmux.conf` > `~/.tmux.conf` > `/etc/tmux.conf`
-* use `source-file` command to load a config
-* config loaded once, errors are displayed but ignored, e.g. version change
-
-### Sockets
-
-* `-L socket-name` to allow multiple tmux servers to run
-* by default the socket is `default` and stored in `$TMUX_TMPDIR` or `/tmp`
-* `-S socket-path` to provide a complete path to socket, ignores `-L` flag
-
-### Miscellaneous flags
-
-* `-u` to force unicode support
-* `-vv` logs everything, but not very useful, try when no server has started
-
-### Colors
-
-* for 256 colors `tmux -2 a`
-
-### CLIENTS AND SESSIONS
-
-
-# Practice
-
-## Basic Usage
-
-* basic start
-* start a long-running command
-* dettach with `prefix-d`
-* re-attach with `tmux attach` or `tmux a`
-
-### Bonus
-
-* show the time `t`
-
-## Intermediate Usage
 
 
 ### Sessions
@@ -282,18 +286,25 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 * Group panes `join-pane -t :{window number}`
 
 
-## Tweaking Status Line
-
-* Space left on disk, for those dockering around
-
 # Random Stuff
 
 * maxing out scrollback buffer
-* writing log to file for postmortem, Prefix-P in my config
-* lure away from using `screen`
 * "You have control" -> "I have control" shared screen routine
 * `split-window vim foo.txt` opens a split and runs the command
 * tmux commands for starting pre-set window layouts and commands
+* (mouse events) x (areas) diagram
+* `tmux lsp -F '#{session_id} #{window_id} #{pane_id}'`
+* `[ -n "$TMUX" ] && echo inside tmux`
+
+```
+%if #{==:#{host_short},firsthost}
+  source ~/.tmux.conf.firsthost
+%elif #{==:#{host_short},secondhost}
+  source ~/.tmux.conf.secondhost
+%endif
+```
+
+* own key table
 
 # Links
 
