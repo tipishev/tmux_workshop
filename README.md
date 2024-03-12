@@ -36,9 +36,10 @@ A little later, when I learned Vim and became obsessed with running everything i
 
 When we run `tmux`, it creates a server. The server is a container for sessions, sessions contain windows, and windows contain panes. Let me demonstrate this.
 
-> run `tmux`
-`C-b $` give name "Klarna"
-`C-b ,` give name "first window"
+> * run `tmux`
+* `C-b $` give name "Klarna"
+* `C-b ,` give name "first window"
+
 `C-b %`  # a vertical split
 `C-b "`  # a horizontal split
 `C-b right left` # to move horizontally
