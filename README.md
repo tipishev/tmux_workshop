@@ -36,20 +36,22 @@ A little later, when I learned Vim and became obsessed with running everything i
 
 When we run `tmux`, it creates a server. The server is a container for sessions, sessions contain windows, and windows contain panes. Let me demonstrate this.
 
-> run `tmux`
-> `C-b $` give name "Klarna"
-> `C-b ,` give name "first window"
-> `C-b %`  # a vertical split
-> `C-b "`  # a horizontal split
-> `C-b right left` # to move horizontally
-> `C-b down up` # to move vertically
-> `C-b c`, `C-,` give name "second window"
-> `C-b &` to close a window, or just close the last pane with `Ctrl-D`
-> `C-b 1` `C-b 2` to go between numbered windows
-> `C-b d` # dettach 
-> run `tmux` 
-> `C-b $` give name "Personal"
-> `C-b w` # display the whole tree with 2 sessions, 3 windows, and their splits 
+>>>
+* run `tmux`
+* `C-b $` give name "Klarna"
+* `C-b ,` give name "first window"
+* `C-b %`  # a vertical split
+* `C-b "`  # a horizontal split
+* `C-b right left` # to move horizontally
+* `C-b down up` # to move vertically
+* `C-b c`, `C-,` give name "second window"
+* `C-b &` to close a window, or just close the last pane with `Ctrl-D`
+* `C-b 1` `C-b 2` to go between numbered windows
+* `C-b d` # dettach
+* run `tmux`
+* `C-b $` give name "Personal"
+* `C-b w` # display the whole tree with 2 sessions, 3 windows, and their splits
+>>>
 
 At this point you may realize, that one terminal is all you need. No need to bother your GUI with windows, tabs, and splits, tmux got you covered. 
 
@@ -124,6 +126,7 @@ Whatever you do in one client is synchronized to every other. That's how my frie
 
 * display-{message,popup,menu}j
 ## Popups
+
 
 ### Building a widget
 
@@ -214,6 +217,8 @@ It demonstrate almost too many features of tmux.
 HERE BE DRAGONS
 
 ==========================
+
+Status icon for background apps?
 
 ---
 * `tmux list-sessions` -> `tmux ls`
