@@ -2,13 +2,24 @@
 
 # Transcript
 
-Welcome to today's workshop. My name is Tim, I am a Competence Lead for Batch Variables team. If you have been to my previous talks on Git, Python debuggers, and TiddlyWiki, you know that I am fascinated with tooling. I like to present tools that are not too big, but nevertheless useful. Today I will show how tmux can boost your productivity when working with terminal applications. I have been using tmux on and of for about 10 years now, and I prepared this workshop to fill the gaps I had. This session consists of 4 parts. In the first I show what tmux and its basic usage. In the second part I explain the architecture of it, namely what are the sessions, clients, windows, and panes. In the third part I will show how tmux operate on these entities with its rich set of commands. In the final part I will show how to add bells and whistles that makes tmux experience smooth for you as a user.
+## Introduction
 
-Whenever we discuss tooling, I use the sea of craziness metaphor: safe and bland vs. very customized but unsupported.
+Welcome to today's workshop. My name is Tim and I am a Competence Lead for Batch Variables team. If you have been to my previous talks on Git, Python debuggers, and TiddlyWiki, you know that I am fascinated with tooling. I like to present tools that are not too big, but nevertheless useful. Today I will show how tmux can boost your productivity when working with terminal applications. I myself have been using tmux on and off for about 10 years, and I finally prepared this workshop to share with you what I know. This session consists of 3 parts.
 
-> cli_stack.png
+In the first part I tell what is tmux, show its basic usage, and describe its architecture and core entities:
+
+* Server,
+* Clients,
+* Sessions,
+* Windows,
+* and Panes
+
+In the second part I show how tmux operates on these entities with its rich set of commands.
+In the third part we will use these commands to configure tmux from scratch to create your own perfect terminal.
 
 ## Part 1: Down the Memory Lane
+
+![CLI stack](cli_stack.png)
 
 Tmux is a short for terminal multiplexer. It's a command line tool that holds the state of one or more terminals. To put it simply, imagine running a command in a terminal, as soon as you close the terminal, the program receives a `SIGHUP` signal that makes it exit.
 
