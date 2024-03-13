@@ -87,7 +87,7 @@ Let's call it "first window".
 
 At this point you may realize, that one terminal is all you need. No need to bother your GUI with windows, tabs, and splits, tmux got you covered. 
 
-(Morpheus)[morpheus.png]
+![Morpheus](morpheus.png)
 
 At this point, may I suggest to you Alacritty, a blazingly fast GPU-accelerated terminal written in Rust that does exactly this: one window, dead simple text config and zero tabs.
 
