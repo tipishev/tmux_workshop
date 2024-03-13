@@ -89,9 +89,9 @@ At this point you may realize, that one terminal is all you need. No need to bot
 
 ![Morpheus](morpheus.png)
 
-At this point, may I suggest to you Alacritty, a blazingly fast GPU-accelerated terminal written in Rust that does exactly this: one window, dead simple text config and zero tabs.
+If this idea resonates with you, I may suggest Alacritty, a blazingly fast GPU-accelerated terminal written in Rust that does exactly this: one window, dead simple text config and zero tabs.
 
-Now you may be saying, but what about my IDE? It also has a terminal. No worries, tmux got you covered: just connet to the same session and this will create another client, connected to the same tmux session:
+Now you may be saying, but what about my IDE? It also has a terminal. No worries, tmux got you covered: just connect to the same session and this will create another client, connected to the same tmux session:
 
 > `:list-clients`
 
@@ -99,7 +99,7 @@ The session is closed, once the last window in it is closed.
 
 Whatever you do in one client is synchronized to every other. That's how my friend and I used to pair-play text-based adventures, we would both SSH to my server, start a Frotz client and take turns typing in commands, passing turns copilot-style: "You have control" -> "I have control".
 
-> copilots.png
+![Copilots](copilots.png)
 
 # Introduction
 
