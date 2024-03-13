@@ -38,7 +38,7 @@ Later, I would shamefully use tmux to run my web servers instead of properly lea
 
 It is at that time I started learning about other features of tmux, my favorite was showing multiple split-terminals at once. I would start the server in one split, open the logs in the second, and run `htop` to show the server CPU and memory usage.
 
-> show `server_dashboard.png`
+![Server Dashboard](server_dashboard.png)
 
 Now I realize that tmux gave me a service dashboard that took just a minute to setup.
 
