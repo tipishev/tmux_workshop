@@ -40,13 +40,13 @@ It is at that time I started learning about other features of tmux, my favorite 
 
 ![Server Dashboard](server_dashboard.png)
 
-Now I realize that tmux gave me a service dashboard that took just a minute to setup.
+Now I realize that tmux gave me a service dashboard that took just 20 seconds to set up.
 
-A little later, when I learned Vim and became obsessed with running everything in terminal, I started using tmux locally as my IDE and wanted to learn everything there is about it. This image from an online book [Tao of Tmux](https://tao-of-tmux.readthedocs.io/en/latest/index.html) (read it!) finally made it click for me:
+A little later, when I learned Vim and became obsessed with running everything in terminal, I started using tmux locally as my IDE and wanted to learn everything there was about it. This image from an online book [Tao of Tmux](https://tao-of-tmux.readthedocs.io/en/latest/index.html) (read it!) finally made it click for me:
 
-> show `tao_of_tmux.png`
+![Architecture](architecture.png)
 
-When we run `tmux`, it creates a server. The server is a container for sessions, sessions contain windows, and windows contain panes. Let me demonstrate this.
+When we run `tmux`, it creates a server, a client, a session, a window, and a pane. The server is a container for sessions, a session is a container for windows, and a window is a container for splits, called panes in tmux terminology. Let me demonstrate this.
 
 > * run `tmux` -f /dev/null  # with no config
 > *  `C-b $` give name "Klarna"
