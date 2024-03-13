@@ -6,7 +6,7 @@
 
 Welcome to today's workshop. My name is Tim and I am a Competence Lead for Batch Variables team. If you have been to my previous talks on Git, Python debuggers, and TiddlyWiki, you know that I am fascinated with tooling. I like to present tools that are not too big, but nevertheless useful. Today I will show how tmux can boost your productivity when working with terminal applications. I myself have been using tmux on and off for about 10 years, and I finally prepared this workshop to share with you what I know. This session consists of 3 parts.
 
-In the first part I tell what is tmux, show its basic usage, and describe its architecture and core entities:
+In the first part I tell what tmux is, show its basic usage, and describe its architecture and core entities:
 
 * Server,
 * Clients,
@@ -16,24 +16,25 @@ In the first part I tell what is tmux, show its basic usage, and describe its ar
 
 In the second part I show how tmux operates on these entities with its rich set of commands.
 In the third part we will use these commands to configure tmux from scratch to create your own perfect terminal.
+In the end we will have a Q&A and exchange tips on how to make tmux experience even better. 
 
 ## Part 1: Down the Memory Lane
 
 ![CLI stack](cli_stack.png)
 
-Tmux is a short for terminal multiplexer. It's a command line tool that holds the state of one or more terminals. To put it simply, imagine running a command in a terminal, as soon as you close the terminal, the program receives a `SIGHUP` signal that makes it exit.
+Tmux is a short for terminal multiplexer. It is a command line tool that holds the state of one or more terminals. To put it simply, imagine running a command in a terminal, as soon as you close that terminal, the program receives a `SIGHUP` signal that makes it exit.
 
 > open terminal.app, start python, close the terminal.
 
-This is fine for running locally, but becomes a problem when you SSH to a remote host, start a long-running command and your connection drops. To deal with this we need to spawn a proxy-process that persists the command's run state. I first encountered this problem back at university when I missed on all the fun conversation on Computer Science IRC channel when I was offline since IRC did not keep message history. At the time this was solved with a tool called GNU screen: I would SSH to the university server, start screen,and run IRC client inside it. When I reconnected to the server, screen was happily holding my chat client unless the server underwent a maintenance reboot. In one of these chat sessions my clubmate was excited about this new tool, tmux, which he described as screen on steroids, so we got it installed on our club's server.
+This is fine for running locally but becomes a problem when you SSH to a remote host, start a long-running command and the connection drops. To deal with this we need to spawn a proxy-process that persists the command's run state. I first encountered this problem back at university when I would miss on all the fun conversation on Computer Science Club IRC channel when I was offline since IRC did not keep message history. At the time this was solved with a tool called GNU screen: I would SSH to the server, start screen, and run IRC client inside screen. When I reconnected to the server, screen was happily holding my chat client alive unless the server underwent a maintenance reboot. In one of these chat sessions my clubmate was excited about this new tool, tmux, which he described as screen on steroids, so we got it installed on our club's server.
 
-This was THE use case for many people, as you can see from tmux's picture on Wikipedia:
+This was THE use case for many people, as you can see even today in tmux's picture on Wikipedia:
 
 > show [tmux Wikipedia page](https://en.wikipedia.org/wiki/tmux)
 
-Later, I would shamefully use tmux to run web servers instead of learning systemd. Now, that I look at all of today's complexity of hosting a website, I realize that it was notsuch a bad idea.
+Later, I would shamefully use tmux to run my web servers instead of properly learning systemd. However, now that I look at all of today's complexity for hosting a website, I realize that it was not such a bad idea.
 
-> show the `gymnast_girl.jpg`
+![Gymnast Girl](gymnast_girl.jpg)
 
 It is at that time I started learning about other features of tmux, my favorite was showing multiple split-terminals at once. I would start the server in one split, open the logs in the second, and run `htop` to show the server CPU and memory usage.
 
