@@ -46,11 +46,33 @@ A little later, when I learned Vim and became obsessed with running everything i
 
 ![Architecture](architecture.png)
 
-When we run `tmux`, it creates a server, a client, a session, a window, and a pane. The server is a container for sessions, a session is a container for windows, and a window is a container for splits, called panes in tmux terminology. Let me demonstrate this.
+Let's see this in action
 
-> * run `tmux` -f /dev/null  # with no config
-> *  `C-b $` give name "Klarna"
-> * `C-b ,` give name "first window"
+> run `tmux` -f /dev/null
+
+We use `-f /dev/null` to start tmux with the default configuration. 
+By running this command we have created a server with one session
+
+> `tmux list-sessions`
+
+and a client attached to this session. 
+
+> `tmux list-clients`
+
+At the moment this session contains just one window and one pane.
+
+Let's give our session a name:
+
+> `C-b $` give name "Klarna"
+
+C-b combination is called the prefix, when you press it, tmux interprets the next keystroke as a shortcut to control its behavior. I will show the most common shortcuts and later I'll show how to list them all, change the default, and create your own.
+
+Now let's enter
+
+> `C-b ,`
+
+Let's call it "first window".
+
 > * `C-b %`  # a vertical split
 > * `C-b "`  # a horizontal split
 > * `C-b right left` # to move horizontally
@@ -65,7 +87,7 @@ When we run `tmux`, it creates a server, a client, a session, a window, and a pa
 
 At this point you may realize, that one terminal is all you need. No need to bother your GUI with windows, tabs, and splits, tmux got you covered. 
 
-> morpheus.png
+(Morpheus)[morpheus.png]
 
 At this point, may I suggest to you Alacritty, a blazingly fast GPU-accelerated terminal written in Rust that does exactly this: one window, dead simple text config and zero tabs.
 
