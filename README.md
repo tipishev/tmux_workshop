@@ -4,9 +4,9 @@
 
 ## Introduction
 
-Welcome to today's workshop. My name is Tim and I am a Competence Lead for Batch Variables team. If you have been to my previous talks on Git, Python debuggers, and TiddlyWiki, you know that I am fascinated with tooling. I like to present tools that are not too big, but nevertheless useful. Today I will show how tmux can boost your productivity when working with terminal applications. I myself have been using tmux on and off for about 10 years, and I finally prepared this workshop to share with you what I know. This session consists of 3 parts.
+Welcome to today's workshop. My name is Tim and I am a Competence Lead for Batch Variables. If you have been to my previous talks on Git, Python debuggers, and TiddlyWiki, you know that I am fascinated with tooling. I like to present tools that are not too big, but nevertheless useful. Today I will show how tmux can boost your productivity when working in terminal. I have been using tmux on and off for about 10 years and I prepared this workshop to share with you what I know. This session consists of 3 parts.
 
-In the first part I tell what tmux is, show its basic usage, and describe its architecture and core entities:
+In the first part I will tell what tmux is, show the basic usage, and describe its architecture and core entities:
 
 * Server,
 * Clients,
@@ -14,31 +14,31 @@ In the first part I tell what tmux is, show its basic usage, and describe its ar
 * Windows,
 * and Panes
 
-In the second part I show how tmux operates on these entities with its rich set of commands.
-In the third part we will use these commands to configure tmux from scratch to create your own perfect terminal.
-In the end we will have a Q&A and exchange tips on how to make tmux experience even better. 
+In the second part I will guide you through my well-documented configuration file that uses a lot of advanced features.
+
+In the third part we will have a Q&A session and exchange tips on how to make tmux experience even better. If we run out of time, we will continue the exchange in #tmux channel on Slack.
 
 ## Part 1: Down the Memory Lane
 
-![CLI stack](cli_stack.png)
+![CLI stack](img/cli_stack.png)
 
 Tmux is a short for terminal multiplexer. It is a command line tool that holds the state of one or more terminals. To put it simply, imagine running a command in a terminal, as soon as you close that terminal, the program receives a `SIGHUP` signal that makes it exit.
 
 > open terminal.app, start python, close the terminal.
 
-This is fine for running locally but becomes a problem when you SSH to a remote host, start a long-running command and the connection drops. To deal with this we need to spawn a proxy-process that persists the command's run state. I first encountered this problem back at university when I would miss on all the fun conversation on Computer Science Club IRC channel when I was offline since IRC did not keep message history. At the time this was solved with a tool called GNU screen: I would SSH to the server, start screen, and run IRC client inside screen. When I reconnected to the server, screen was happily holding my chat client alive unless the server underwent a maintenance reboot. In one of these chat sessions my clubmate was excited about this new tool, tmux, which he described as screen on steroids, so we got it installed on our club's server.
+This is fine for running locally but becomes a problem when you SSH to a remote host, start a long-running command and the connection drops. To deal with this we need to spawn a proxy-process that persists the command's run state. I first encountered this problem back at university when I would miss on all the fun conversation on Computer Science Club IRC channel when I was offline since IRC did not keep history. At the time this was solved with a tool called GNU screen: I would SSH to the server, start screen, and run IRC client inside screen. When I reconnected to the server, screen was happily holding my chat client alive unless the server underwent a maintenance reboot. In one of these chat sessions my clubmate was excited about this new tool, tmux, which he described as screen on steroids, so we got it installed on the server.
 
 This was THE use case for many people, as you can see even today in tmux's picture on Wikipedia:
 
 > show [tmux Wikipedia page](https://en.wikipedia.org/wiki/tmux)
 
-Later, I would shamefully use tmux to run my web servers instead of properly learning systemd. However, now that I look at all of today's complexity for hosting a website, I realize that it was not such a bad idea.
+Later, I would shamefully use tmux to run my web servers instead of properly learning systemd. However, now that I look at all of today's complexity for hosting a website, I realize that it was not such a bad idea after all.
 
-![Gymnast Girl](gymnast_girl.jpg)
+![Gymnast Girl](img/gymnast_girl.jpg)
 
-It is at that time I started learning about other features of tmux, my favorite was showing multiple split-terminals at once. I would start the server in one split, open the logs in the second, and run `htop` to show the server CPU and memory usage.
+It is at that time I started learning about other features of tmux, my favorite was showing multiple split-terminals, called panes, at once. I would start the server in one split, open the logs in the other, and run `htop` in the third to show the server CPU and memory usage.
 
-![Server Dashboard](server_dashboard.png)
+![Server Dashboard](img/server_dashboard.png)
 
 Now I realize that tmux gave me a service dashboard that took just 20 seconds to set up.
 
@@ -48,16 +48,11 @@ A little later, when I learned Vim and became obsessed with running everything i
 
 Let's see this in action
 
-> run `tmux` -f /dev/null
+> run `tmux -f /dev/null`
 
 We use `-f /dev/null` to start tmux with the default configuration. 
 By running this command we have created a server with one session
-
-> `tmux list-sessions`
-
 and a client attached to this session. 
-
-> `tmux list-clients`
 
 At the moment this session contains just one window and one pane.
 
@@ -65,54 +60,207 @@ Let's give our session a name:
 
 > `C-b $` give name "Klarna"
 
-C-b combination is called the prefix, when you press it, tmux interprets the next keystroke as a shortcut to control its behavior. I will show the most common shortcuts and later I'll show how to list them all, change the default, and create your own.
+C-b combination is called the prefix, when you press it, tmux interprets the next keystroke as a shortcut to control its behavior. We will look at the most common shortcuts and later I'll show how to list them, change the default keybinding, and create your own.
 
 Now let's enter
 
 > `C-b ,`
 
-Let's call it "first window".
+To rename the window. And call it "first window".
 
-> * `C-b %`  # a vertical split
-> * `C-b "`  # a horizontal split
-> * `C-b right left` # to move horizontally
-> * `C-b down up` # to move vertically
-> * `C-b c`, `C-,` give name "second window"
-> * `C-b &` to close a window, or just close the last pane with `Ctrl-D`
-> * `C-b 1` `C-b 2` to go between numbered windows
-> * `C-b d` # dettach
-> * run `tmux`
-> * `C-b $` give name "Personal"
-> * `C-b w` # display the whole tree with 2 sessions, 3 windows, and their splits
+To create the second window let's run
 
-At this point you may realize, that one terminal is all you need. No need to bother your GUI with windows, tabs, and splits, tmux got you covered. 
+> `C-b c` and call it "second window"
 
-![Morpheus](morpheus.png)
+We can switch between the window with prefix-1, prefix-2, etc.
 
-If this idea resonates with you, I may suggest Alacritty, a blazingly fast GPU-accelerated terminal written in Rust that does exactly this: one window, dead simple text config and zero tabs.
+> `C-b 1` `C-b 2` to go between numbered windows
 
-Now you may be saying, but what about my IDE? It also has a terminal. No worries, tmux got you covered: just connect to the same session and this will create another client, connected to the same tmux session:
+We can subdivide windows into panes either vertically:
+
+> `C-b %`
+
+Or horizontally:
+
+> `C-b "`
+
+To move between panes we use prefix-arrow keys.
+
+> `C-b &` to close a window, or just close the last pane with `Ctrl-D` and the window will close.
+
+Now let's run a program in one of the panes and dettach from the session.
+
+> `python3`
+> `C-b d` # dettach
+
+To reattach, we call `tmux -a`, short for attach. And we see that the 
+Python shell is still running. This is the absolute minimum I want you to remember next time when it's 5:45 in the evening, you have a script chugging along on a remote server over SSH and you decide whether to leave the laptop at the office to finish the script over night.
+
+Now, let's dettach again `C-b d` and start another session:
+
+> * `tmux`
+> * `C-b $` name it "Personal"
+
+You can switch between sessions from the same terminal emulator with
+
+> * `C-b w`
+
+At this point you may realize, that one terminal is all you need. No need to bother your GUI with windows, tabs, and splits, tmux got you covered with sessions, windows, and panes.
+
+![Morpheus](img/morpheus.png)
+
+If you like this idea, may I suggest Alacritty, a blazingly fast GPU-accelerated terminal written in Rust that does exactly this: forces a single window, zero tabs, and a dead-simle text configuration.
+
+Now you may be saying, but what about my IDE? It also has a terminal. Tmux got you covered, too. Attaching to the a running session from IDE's terminal will create another client, connected to the same tmux session:
 
 > `:list-clients`
 
-The session is closed, once the last window in it is closed.
+The session is closed, when its last window is closed.
 
-Whatever you do in one client is synchronized to every other. That's how my friend and I used to pair-play text-based adventures, we would both SSH to my server, start a Frotz client and take turns typing in commands, passing turns copilot-style: "You have control" -> "I have control".
+Whatever you do in one client is synchronized to every other. That's how my friend and I used to pair-play text-based adventures, we would both SSH to my server, start a Frotz client in tmux and take turns typing in commands, passing turns copilot-style: "You have control" -> "I have control".
 
-![Copilots](copilots.png)
+![Copilots](img/copilots.png)
 
-# Introduction
+# Part 3: Configuration
 
+Now, let's close this ugly 
+
+`cat /var/log/confer.log`
+
+```
+# 256 colors by default
+set -g default-terminal "screen-256color"
+
+# Set a C-a prefix, same as in GNU screen
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# -v to echo what was read
+bind-key -N "Reload config" R \
+    source-file -v ~/.tmux.conf \; \
+    display "Reloaded from ~/.tmux.conf"
+
+# Window manager options
+
+## because 0 is too far on the right
+set -g base-index 1
+set -g pane-base-index 1
+
+## avoid holes in Window numbering
+set-option -g renumber-windows on
+
+## open Panes and Windows in the same directory as the current pane
+bind '"' split-window -c "#{pane_current_path}"
+bind % split-window -h -c "#{pane_current_path}"
+bind c new-window -c "#{pane_current_path}"
+
+# scrollback aka history
+
+## 64K (lines) ought to be enough for anybody
+set-option -g history-limit 64000
+
+## enter copy mode on prefix-PageUp
+## -e: exit copy-mode when scrolled to bottom
+## -u: move 1 page up
+bind PageUp copy-mode -eu
+
+## save scrollback history to file on prefix-P
+bind-key P command-prompt -p 'save history to filename:' -I '~/#{window_name}_%Y-%m-%d_tmux.history' 'capture-pane -S -32768 ; save-buffer %1 ; delete-buffer'
+
+# Status bar customization
+set -g status-interval 1  # refresh status every second
+
+## left status
+set -g status-left-length 90
+set -g status-left "\
+#[fg=green]#(whoami)\
+#[fg=white]@\
+#[fg=cyan]#(hostname -s)\
+"
+
+## center status
+set -g status-justify centre
+set -g status-bg black
+set -g status-fg white
+
+## right status
+set -g status-right-length 60
+set -g status-right "\
+#{?mouse,🐀,}\
+#{?pane_pipe,🔴,}\
+#[fg=magenta]#{session_name}\
+#[fg=white] %Y-%m-%d %H:%M:%S\
+"
+
+# Vimifying
+
+## vim-keys for pane navigation
+unbind-key j; bind-key j select-pane -D
+unbind-key k; bind-key k select-pane -U
+unbind-key h; bind-key h select-pane -L
+unbind-key l; bind-key l select-pane -R
+
+# needs more vim
+set-window-option -g status-keys vi
+set-window-option -g mode-keys vi
+bind Escape copy-mode
+bind-key -T copy-mode-vi 'v' send -X begin-selection
+bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
+unbind p; bind p paste-buffer
+unbind n  # to be consistent with rebinding 'p', can I use it for next search result?
+unbind ]  # y tho?
+
+bind C-k resize-pane -U 1
+bind C-j resize-pane -D 1
+bind C-h resize-pane -L 1
+bind C-l resize-pane -R 1
+
+# Visuals
+
+## make a clock green on prefix-T
+set -g clock-mode-colour green
+
+## visually appealing round popups
+set -g popup-border-lines rounded
+
+# Key bindings
+
+## Silly popup widgets
+
+bind-key -N "Display a fortune" F \
+display-popup -E -w 80 -h 15 \
+"fortune && read -n 1 -s -r"
+
+bind-key -N "Display the caledar" C \
+display-popup -E -x 999 -y 999 -w 22 -h 13 \
+"cal -N && read -n 1 -s -r"
+
+## Function Keys made useful
+bind-key -T root -N "Toggle mouse" F3 \
+set mouse
+
+bind-key -T root -N "Toggle status bar" F4 \
+set -g status
+
+### Klarna shortcuts
+bind-key -T root F5 \
+display-menu -T "#[align=centre bg=#ffc0cb fg=black bold]Klarna" -x P -y P \
+"AWS Login: DLT" d { send-keys "aws-login-tool login -a 426895431386 -r iam-sync/lakehouse-dlt/lakehouse-dlt.IdP_merchant-variables" Enter } \
+"AWS Login: Playground" p { send-keys "aws-login-tool login -a 535232001183 -r iam-sync/merchant-variables/merchant-variables.IdP_admin" Enter }
+
+## keep an audit log of a session
+bind-key C-p \
+  pipe-pane -o "cat >> ~/Desktop/tmux-log.#{session_name}-#{window_name}-#{pane_title}" \; \
+  display-message "#{?pane_pipe,Started,Stopped} logging to ~/Desktop/tmux-log.#{session_name}-#{window_name}-#{pane_title}"
+```
 
 # Basic Usage
-* `base-index` set to 1 for ease of keyboard access, `pane-base-index` for panes
-* `renumber-windows` to avoid having holes in window numbers
-* remark on attention span and importance of tabs ordering in browser and windows
 * for complete focus zoom with Z, hide status bar with `set -g status`
-* for 256 colors `tmux -2 a`
 * show the time `t`
 
 ## Preset layouts
+
 * `prefix-space`
 * `display-panes`
 * display-panes timeout + reload
@@ -123,16 +271,12 @@ Whatever you do in one client is synchronized to every other. That's how my frie
 ## Config
 
 * `-f some_tmux.conf` > `~/.tmux.conf` > `/etc/tmux.conf`
-* use `source-file` command to load a config
 * config loaded once, errors are displayed but ignored, e.g. version change
 
 
 # Usability
 * `set synchronize-panes` for doing the same operation on multiple servers
 * prefix: same everywhere, thus digging else `^b` for local `^a` for remote.
-
-## Screenshoting a pane
-* `capture-pane` TODO, doesn't seem to work
 
 # Options
 * on/off options can be toggled without specifiying `on`/`off`
@@ -148,6 +292,8 @@ Whatever you do in one client is synchronized to every other. That's how my frie
 * create your own table on top of existing four.
 
 ---
+tmux tab-completion
+---
 
 # UI
 
@@ -156,17 +302,9 @@ Whatever you do in one client is synchronized to every other. That's how my frie
 * status-interval default is 15 seconds, change to 1 second for faster refresh, e.g. show seconds in time
 * Space left on disk, for those dockering around
 
-* display-{message,popup,menu}j
-## Popups
-
 
 ### Building a widget
 
-* `display-popup -E -T Calendar -w 23 -h 11 "cal -N && read -n 1 -s -r"`
-** check for bound keys with prefix-/
-** bind-key -N "Display a fortune" F display-popup -E -T Fortune -w 80 -h 10 "fortune && read -n 1 -s -r"
-** bind it to a key
-** add note `show calendar`
 ** prefix-/ to see the note
 ** prefix-? to see the list
 ** save key to tmux-config TODO how to paste from history?
@@ -272,8 +410,7 @@ Status icon for background apps?
 
 ### Panes
 
-* arrows to navigate, pro-tip: vi-keys
-* resize with `C-arrows`, mega-resize with `M-arrows`
+* resize with `C-arrows`, mega-resize with `M-arrows`, don't bother, use a mouse
 * kill with `x`
 * change layout with `C-space`
 * rotate splits with `C-o`
@@ -326,7 +463,6 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 
 # Random Stuff
 
-* maxing out scrollback buffer
 * (mouse events) x (areas) diagram
 * `tmux lsp -F '#{session_id} #{window_id} #{pane_id}'`
 * `[ -n "$TMUX" ] && echo inside tmux`
@@ -340,6 +476,8 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 ```
 
 * own key table
+* choose-
+* list-
 
 # Links
 
