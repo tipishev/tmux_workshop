@@ -44,7 +44,7 @@ Now I realize that tmux gave me a service dashboard that took just 20 seconds to
 
 A little later, when I learned Vim and became obsessed with running everything in terminal, I started using tmux locally as my IDE and wanted to learn everything there was about it. This image from an online book [Tao of Tmux](https://tao-of-tmux.readthedocs.io/en/latest/index.html) (read it!) finally made it click for me:
 
-![Architecture](architecture.png)
+![Architecture](img/architecture.png)
 
 Let's see this in action
 
