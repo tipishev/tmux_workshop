@@ -123,53 +123,72 @@ Whatever you do in one client is synchronized to every other. That's how my frie
 
 # Part 3: Configuration
 
-Now, let's close this ugly 
+Now, let's walk over my configuration file and see what may be useful for you. If at any point you have questions, please ask.
 
-`cat /var/log/confer.log`
-
-```
+```tmux
 # 256 colors by default
 set -g default-terminal "screen-256color"
+
+# point tiny arrows at the active pane
+set -g pane-border-indicators arrows
 
 # Set a C-a prefix, same as in GNU screen
 unbind C-b
 set -g prefix C-a
 bind C-a send-prefix
 
-# -v to echo what was read
-bind-key -N "Reload config" R \
+# -v to echo each parsed line
+# helps to catch errors
+bind-key -N "Reload the config" R \
     source-file -v ~/.tmux.conf \; \
-    display "Reloaded from ~/.tmux.conf"
+    display "✅ reloaded the config!"
 
-# Window manager options
+# Window (aka tabs) options
 
 ## because 0 is too far on the right
 set -g base-index 1
 set -g pane-base-index 1
 
-## avoid holes in Window numbering
+## avoid holes in window numbering
 set-option -g renumber-windows on
 
-## open Panes and Windows in the same directory as the current pane
+## open new panes and windows in the same directory
+## as the current pane
 bind '"' split-window -c "#{pane_current_path}"
 bind % split-window -h -c "#{pane_current_path}"
 bind c new-window -c "#{pane_current_path}"
 
-# scrollback aka history
+# history aka scrollback
 
-## 64K (lines) ought to be enough for anybody
-set-option -g history-limit 64000
+## 32k (lines) ought to be enough for anybody
+set-option -g history-limit 32000
 
 ## enter copy mode on prefix-PageUp
 ## -e: exit copy-mode when scrolled to bottom
 ## -u: move 1 page up
 bind PageUp copy-mode -eu
 
-## save scrollback history to file on prefix-P
-bind-key P command-prompt -p 'save history to filename:' -I '~/#{window_name}_%Y-%m-%d_tmux.history' 'capture-pane -S -32768 ; save-buffer %1 ; delete-buffer'
+## save scrollback history to a file
+## -e to include escape sequences, e.g. colors
+## `-S -` to start from the first line in history
+## `-E -` to end with the last line in history
+bind-key -N "Save pane history to a file" P \
+command-prompt \
+  -p 'save pane history to:' \
+  -I '#{session_name}-#{window_name}-#{pane_index}_%Y-%m-%d_tmux.history' \
+  "capture-pane -e -S - -E -; save-buffer %1; delete-buffer"
+
+## keep an audit log of all pane output
+## -o to allow toggling start and end of piping
+bind-key -N "Record pane output to a file" C-p \
+  pipe-pane -o "cat >> #S-#W-#P_%Y-%m-%d_tmux.record" \; \
+  display-message "#{?pane_pipe,Started,Stopped} \
+logging to #S-#W-#P_%Y-%m-%d.record"
 
 # Status bar customization
-set -g status-interval 1  # refresh status every second
+
+## refresh status every second
+set -g status-interval 1
 
 ## left status
 set -g status-left-length 90
@@ -201,16 +220,21 @@ unbind-key k; bind-key k select-pane -U
 unbind-key h; bind-key h select-pane -L
 unbind-key l; bind-key l select-pane -R
 
-# needs more vim
-set-window-option -g status-keys vi
-set-window-option -g mode-keys vi
+## emacs is the other alternative
+set-window-option -g status-keys vi  # for status line
+set-window-option -g mode-keys vi  # for copy-mode
+
 bind Escape copy-mode
 bind-key -T copy-mode-vi 'v' send -X begin-selection
 bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
-unbind p; bind p paste-buffer
-unbind n  # to be consistent with rebinding 'p', can I use it for next search result?
-unbind ]  # y tho?
 
+## pasting buffer 
+unbind ]  # unbind the default 'paste buffer'
+unbind p  # unbind 'previous window'
+unbind n  # unbind next window to be consistent with rebinding 'p'
+bind p paste-buffer
+
+## bind pane resizing
 bind C-k resize-pane -U 1
 bind C-j resize-pane -D 1
 bind C-h resize-pane -L 1
@@ -229,54 +253,45 @@ set -g popup-border-lines rounded
 ## Silly popup widgets
 
 bind-key -N "Display a fortune" F \
-display-popup -E -w 80 -h 15 \
-"fortune && read -n 1 -s -r"
+display-popup -E -w 40% -h 40% \
+"fortune && read -s -n 1 "  # "read -s -n 1" to close on any key
 
 bind-key -N "Display the caledar" C \
 display-popup -E -x 999 -y 999 -w 22 -h 13 \
-"cal -N && read -n 1 -s -r"
+"cal -N && read -s -n 1"  # "read -s -n 1" to close on any key
 
 ## Function Keys made useful
+
 bind-key -T root -N "Toggle mouse" F3 \
 set mouse
 
 bind-key -T root -N "Toggle status bar" F4 \
 set -g status
 
-### Klarna shortcuts
-bind-key -T root F5 \
+bind-key -T root -N "Klarna shortcuts" F5 \
 display-menu -T "#[align=centre bg=#ffc0cb fg=black bold]Klarna" -x P -y P \
 "AWS Login: DLT" d { send-keys "aws-login-tool login -a 426895431386 -r iam-sync/lakehouse-dlt/lakehouse-dlt.IdP_merchant-variables" Enter } \
 "AWS Login: Playground" p { send-keys "aws-login-tool login -a 535232001183 -r iam-sync/merchant-variables/merchant-variables.IdP_admin" Enter }
-
-## keep an audit log of a session
-bind-key C-p \
-  pipe-pane -o "cat >> ~/Desktop/tmux-log.#{session_name}-#{window_name}-#{pane_title}" \; \
-  display-message "#{?pane_pipe,Started,Stopped} logging to ~/Desktop/tmux-log.#{session_name}-#{window_name}-#{pane_title}"
 ```
 
-# Basic Usage
+`cat /var/log/confer.log` to create long history
+
 * for complete focus zoom with Z, hide status bar with `set -g status`
 * show the time `t`
 
 ## Preset layouts
 
 * `prefix-space`
-* `display-panes`
-* display-panes timeout + reload
 * default: select-pane, change to kill pane, see `template` arg
 * `main-pane-height`, `main-pane-width width`, `other-pane-height`, `other-pane-width`
+
+# Misc
+* `prefix-~` to see the history of received commands.
 * prefix-f to find the window: full-text search in what is shown in the pane.
-
-## Config
-
-* `-f some_tmux.conf` > `~/.tmux.conf` > `/etc/tmux.conf`
-* config loaded once, errors are displayed but ignored, e.g. version change
-
-
-# Usability
+* config loaded once, errors are displayed but ignored, e.g. version change, use -v
 * `set synchronize-panes` for doing the same operation on multiple servers
 * prefix: same everywhere, thus digging else `^b` for local `^a` for remote.
+* tmux tab-completion support is quite good both in in
 
 # Options
 * on/off options can be toggled without specifiying `on`/`off`
@@ -286,14 +301,10 @@ bind-key C-p \
 # Key Binding
 * `list-keys` to see the default bindings
 * `C-b ?` shows help
-* C-b /       Describe key binding
+* `C-b /` Describe a key binding
 * bind key to the root table, no need for prefix now you can finally put those silly function keys to use!
  - default root is quite bland, only mouse events with up to triple (!) mouse
 * create your own table on top of existing four.
-
----
-tmux tab-completion
----
 
 # UI
 
@@ -302,46 +313,74 @@ tmux tab-completion
 * status-interval default is 15 seconds, change to 1 second for faster refresh, e.g. show seconds in time
 * Space left on disk, for those dockering around
 
-
-### Building a widget
-
-** prefix-/ to see the note
-** prefix-? to see the list
-** save key to tmux-config TODO how to paste from history?
-
 ## Menus
 
-Let's take the most complex command from `list-keys`
-
-`prefix->`
+Let's take one of the most complex command from `list-keys` `prefix->` aka Window menu.
 
 
 ```
-display-menu -T "#[align=centre]#{pane_index} (#{pane_id})" -x P -y P "#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Top,
-}" < { send-keys -X history-top } "#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Bottom,}" > { send-keys -X history-bottom } '' "#{?mouse_word,Search For #[underscore]#{=
-/9/...:mouse_word},}" C-r { if-shell -F "#{?#{m/r:(copy|view)-mode,#{pane_mode}},0,1}" "copy-mode -t=" ; send-keys -X -t = search-backward "#{q:mouse_word}" } "#{?mouse_w
-ord,Type #[underscore]#{=/9/...:mouse_word},}" C-y { copy-mode -q ; send-keys -l "#{q:mouse_word}" } "#{?mouse_word,Copy #[underscore]#{=/9/...:mouse_word},}" c { copy-mo
-de -q ; set-buffer "#{q:mouse_word}" } "#{?mouse_line,Copy Line,}" l { copy-mode -q ; set-buffer "#{q:mouse_line}" } '' "Horizontal Split" h { split-window -h } "Vertical
- Split" v { split-window -v } '' "#{?#{>:#{window_panes},1},,-}Swap Up" u { swap-pane -U } "#{?#{>:#{window_panes},1},,-}Swap Down" d { swap-pane -D } "#{?pane_marked_set
-,,-}Swap Marked" s { swap-pane } '' Kill X { kill-pane } Respawn R { respawn-pane -k } "#{?pane_marked,Unmark,Mark}" m { select-pane -m } "#{?#{>:#{window_panes},1},,-}#{
-?window_zoomed_flag,Unzoom,Zoom}" z { resize-pane -Z }
+display-menu -T "#[align=centre]#{pane_index} (#{pane_id})" -x P -y P 
+"#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Top,}" 
+< { send-keys -X history-top } 
+"#{?#{m/r:(copy|view)-mode,#{pane_mode}},Go To Bottom,}" 
+> { send-keys -X history-bottom } 
+
+'' 
+
+"#{?mouse_word,Search For #[underscore]#{=/9/...:mouse_word},}" 
+C-r { if-shell -F "#{?#{m/r:(copy|view)-mode,#{pane_mode}},0,1}" "copy-mode -t=" ; 
+send-keys -X -t = search-backward "#{q:mouse_word}" } 
+"#{?mouse_word,Type #[underscore]#{=/9/...:mouse_word},}" 
+C-y { copy-mode -q ; send-keys -l "#{q:mouse_word}" } 
+"#{?mouse_word,Copy #[underscore]#{=/9/...:mouse_word},}" 
+c { copy-mode -q ; set-buffer "#{q:mouse_word}" } 
+"#{?mouse_line,Copy Line,}" 
+l { copy-mode -q ; set-buffer "#{q:mouse_line}" } 
+
+'' 
+
+"Horizontal Split" 
+h { split-window -h } 
+
+"Vertical Split" 
+v { split-window -v } 
+
+'' 
+
+"#{?#{>:#{window_panes},1},,-}Swap Up" 
+
+u { swap-pane -U } 
+
+"#{?#{>:#{window_panes},1},,-}Swap Down" 
+
+d { swap-pane -D } 
+
+"#{?pane_marked_set,,-}Swap Marked" 
+
+s { swap-pane } 
+
+'' 
+
+Kill X { kill-pane } 
+
+Respawn R { respawn-pane -k } 
+
+"#{?pane_marked,Unmark,Mark}" 
+
+m { select-pane -m } 
+
+"#{?#{>:#{window_panes},1},,-}#{?window_zoomed_flag,Unzoom,Zoom}" 
+
+z { resize-pane -Z }
 ```
-
-It demonstrate almost too many features of tmux.
-
-### Klarna shortcuts
 
 * starting name with `-` makes an item disabled
 * add a `''` for a separator
 
-## Borders
-* pane-border-indicators [off | colour | arrows | both] is quite neat
-* `popup-border-lines` rounded is cool
-
 ## Formats
 
 * Conditionals: show mousy icon in my right status.
-** regular expressions are supported when simple string comparison is not enough 
+  * regular expressions are supported when simple string comparison is not enough 
 * Numeric operators: default integer/float optional
 * `#{e|*|f|4:5.5,3}`  for a complicated calculator
 * `#{a:64}` for ASCII lookup
@@ -353,21 +392,12 @@ It demonstrate almost too many features of tmux.
 ## Styles #[...]
 
 * fg=, bg=
-** black, red, green, yellow, blue, magenta, cyan, white;
-** brightred, brightgreen, brightyellow
-** colour0 to colour255
-** hex-code e.g. #ffffff
+  * black, red, green, yellow, blue, magenta, cyan, white;
+  * brightred, brightgreen, brightyellow
+  * colour0 to colour255
+  * hex-code e.g. #ffffff
 * align: left, center, right
 * best way to play is in status line 
-
-
-### Format Variables
-* there are abbreviations for commonly used ones e.g. `#H` for `host`, `#S` for `session_name`.
-* `display-message "#{cursor_character}"
----
-
-# Copy Mode
-* scrollback and search in history for error message
 
 # Mouse Usage
 * mouse right-click to select menu items
@@ -382,29 +412,8 @@ It demonstrate almost too many features of tmux.
 * Pipe pane can be used also for input: `:pipe-pane -I "echo 'echo hello'"`
  - Funnily enough, both input and output can be enabled for pipe-pane. So, if you want to give some script both input and output access to your terminal, tmux can help you with that.
 
-==========================
-
-HERE BE DRAGONS
-
-==========================
-
-Status icon for background apps?
-
----
-* `tmux list-sessions` -> `tmux ls`
-* `Pr-w` for an interactive overview
-* `Pr-f` for string search
-* `Pr-&` end it all, with confirmation
-* `Pr-%`, `Pr-"`, `Pr-o`, `Pr-arrows` for moving between splits
-* `^<space>` for pre-set layouts
-
-* `Pr-?` for current key-bindings, TODO run it
-
-
 ### Windows
 
-* move with `.`, pro-tip: autonumber to allow moving to `0` and `99`  focus and tab-stack
-* `f` search window for text
 * `i` window info, too fast? use `~` to see tmux messages
 * go to bell/activity `M-n` / `M-o`
 
@@ -434,9 +443,6 @@ From the olden days of window point-and-click buffers were useful, so tmux impro
 ## Commands
 
 A whole new beast: `:`
-
-Hello world: `display-message hello!`
-
 Targeting with `-t` (target) and sometimes `-s` (source)
 
 * `target-client`: /dev/ttyp1
@@ -460,13 +466,6 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 
 * Group panes `join-pane -t :{window number}`
 
-
-# Random Stuff
-
-* (mouse events) x (areas) diagram
-* `tmux lsp -F '#{session_id} #{window_id} #{pane_id}'`
-* `[ -n "$TMUX" ] && echo inside tmux`
-
 ```
 %if #{==:#{host_short},firsthost}
   source ~/.tmux.conf.firsthost
@@ -475,7 +474,6 @@ Targeting with `-t` (target) and sometimes `-s` (source)
 %endif
 ```
 
-* own key table
 * choose-
 * list-
 
